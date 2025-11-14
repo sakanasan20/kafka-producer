@@ -10,8 +10,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
-import com.niqdev.kafka.event.ProductCreatedEvent;
 import com.niqdev.kafka.model.CreateProductRestModel;
+import com.niqdev.kafka.shared.event.ProductCreatedEvent;
 
 @Service
 public class ProductServiceImpl implements ProductService {
