@@ -1,9 +1,9 @@
 package com.niqdev.kafka.service;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-import org.apache.kafka.common.Uuid;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -27,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public String createProduct(CreateProductRestModel product) throws Exception {
 		
-		String productId = Uuid.randomUuid().toString();
+		String productId = UUID.randomUUID().toString();
 		
 		// TODO: Persist product
 		
@@ -47,8 +47,13 @@ public class ProductServiceImpl implements ProductService {
 		
 		LOGGER.info("***** Before publishing a ProductCreatedEvent");
 		
+		ProducerRecord<String, ProductCreatedEvent> producerRecord = 
+				new ProducerRecord<>("product-created-events-topic", productId, productCreatedEvent);
+		
+		producerRecord.headers().add("messageId", UUID.randomUUID().toString().getBytes());
+		
 		SendResult<String, ProductCreatedEvent> result = 
-				kafkaTemplate.send("product-created-events-topic", productId, productCreatedEvent).get();
+				kafkaTemplate.send(producerRecord).get();
 		
 		LOGGER.info("***** Partition: " + result.getRecordMetadata().partition());
 		LOGGER.info("***** Topic: " + result.getRecordMetadata().topic());
